@@ -11,7 +11,7 @@
  Write-Host
 
 <# Provision a single URL #>
- $URLs = "https://massgov.sharepoint.com/sites/doe-seis"
+ $URLs = "https://massgov.sharepoint.com/sites/..."
 
 $clientSideComponentId = "af656294-ff42-406d-b282-b2d5d2b9a801"
 
