@@ -22,7 +22,7 @@ LogWrite "***** At the start of the script calling Connect-AzureAD. *****"
 #$credentials = new-object -typename System.Management.Automation.PSCredential -argumentlist "Svc-EOE-It-Apps@mass.gov",$password
 #Connect-AzureAd -Credential $credentials
 
-Connect-AzureAd
+Connect-AzureAd -AccountId "todd.danos@mass.gov"
 Clear
 # Groups created using the following code.
 # New-AzureADGroup -DisplayName "DOE-AllUsers" -MailEnabled $false -SecurityEnabled $true -MailNickName "NotSet"
