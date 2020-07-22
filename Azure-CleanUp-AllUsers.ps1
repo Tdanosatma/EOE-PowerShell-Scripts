@@ -3,6 +3,7 @@
 # Update-Module AzureAD
 # 
 # Connect-AzureAd
+Connect-AzureAd -AccountId "todd.danos@mass.gov"
 Clear
 
 <#

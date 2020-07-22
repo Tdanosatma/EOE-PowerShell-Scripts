@@ -48,7 +48,7 @@ manual excution
 #$user = Get-Azureaduser -ObjectId ""
 #$user = Get-AzureADUser -Filter "userPrincipalName eq 'jondoe@contoso.com'
 
-$credentials = Get-Credential;
+#$credentials = Get-Credential;
 
 $SiteURL = "https://massgov.sharepoint.com/sites/eoe-it-sp"
 
@@ -58,7 +58,8 @@ $SiteURL = "https://massgov.sharepoint.com/sites/eoe-it-sp"
 
 # Non-MFA
 
-Connect-AzureAd -Credential $credentials
+#Connect-AzureAd -Credential $credentials
+Connect-AzureAd -AccountId "todd.danos@mass.gov"
 #Connect-PnPOnline –Url $SiteURL -Credential $credentials
 
 # List Display name, include spaces if required.
@@ -79,7 +80,6 @@ $Unlicensed = "Unlicensed"
  
 # Loop through $Groups list above.
 foreach ($group in $groups) {
-
     
     $UserQuery = "accountEnabled eq true and userType eq 'Member' and (Department eq '" + $Group.Agency + "')"  
     $users = Get-AzureAdUser -All:$true -Filter $UserQuery
@@ -88,8 +88,8 @@ foreach ($group in $groups) {
     Write-host "Agency: "  $group.Agency 
     Write-Host " Count: " $users.count       
 
-        # Loop through Users
-        foreach ($user in $users) {
+    # Loop through Users
+    foreach ($user in $users) {
 
        # Write-Host $user.DisplayName $user.ObjectId
 
@@ -111,110 +111,103 @@ foreach ($group in $groups) {
         $SPOnline = $License.ServicePlans | where-Object{$_.ServicePlanName -eq "SHAREPOINTWAC_GOV"} # Office Online for Government
         $PowerApps = $License.ServicePlans | where-Object{$_.ServicePlanName -eq "POWERAPPS_O365_P2_GOV"} # PowerApps
 
-   # If the user has a license
-   If ($user.AssignedLicenses) {
+        # If the user has a license
+        If ($user.AssignedLicenses) {
 
-# User found. Update List Item
-    # Get Item from Array
-    $ListItem = $ListItems | where {($_.Title -eq $user.ObjectId)}
-    If ($listitem.Title -eq $user.ObjectId) { 
-    
-    Write-Host "# Update" $user.UserPrincipalName $ListItem.id
-    <#
-    Set-PnPListItem -List $ListName -Identity $ListItem.id -Values @{"Title" = $user.ObjectId;
-   "Department"= $user.Department;
-   "UPN"= $user.UserPrincipalName; "User_x0020_Type" = $user.UserType; 
-   "RMS"= $RMS.ProvisioningStatus;                   
-   "Exchange"= $Exchange.ProvisioningStatus;         
-   "Flow"= $Flow.ProvisioningStatus;                 
-   "Forms"= $Forms.ProvisioningStatus;                
-   "Teams"= $Teams.ProvisioningStatus;             
-   "Planner"= $Planner.ProvisioningStatus;         
-   "ProPlus"= $ProPlus.ProvisioningStatus;         
-   "SharePoint"= $SharePoint.ProvisioningStatus;   
-   "Skype"= $Skype.ProvisioningStatus;             
-   "Stream"= $Stream.ProvisioningStatus;           
-   "Online"= $SPOnline.ProvisioningStatus;         
-   "PowerApps"= $PowerApps.ProvisioningStatus;  } #>
-   } 
-   # AssignedLicenses
-     ELSE {         
-
-    # Add new item.
-    Write-Host "# Add" $user.UserPrincipalName
+            # User found. Update List Item
+            # Get Item from Array
+            $ListItem = $ListItems | where {($_.Title -eq $user.ObjectId)}
+            If ($listitem.Title -eq $user.ObjectId) { 
+                Write-Host "# Update" $user.UserPrincipalName $ListItem.id
+                <#
+                Set-PnPListItem -List $ListName -Identity $ListItem.id -Values @{"Title" = $user.ObjectId;
+                "Department"= $user.Department;
+                "UPN"= $user.UserPrincipalName; "User_x0020_Type" = $user.UserType; 
+                "RMS"= $RMS.ProvisioningStatus;                   
+                "Exchange"= $Exchange.ProvisioningStatus;         
+                "Flow"= $Flow.ProvisioningStatus;                 
+                "Forms"= $Forms.ProvisioningStatus;                
+                "Teams"= $Teams.ProvisioningStatus;             
+                "Planner"= $Planner.ProvisioningStatus;         
+                "ProPlus"= $ProPlus.ProvisioningStatus;         
+                "SharePoint"= $SharePoint.ProvisioningStatus;   
+                "Skype"= $Skype.ProvisioningStatus;             
+                "Stream"= $Stream.ProvisioningStatus;           
+                "Online"= $SPOnline.ProvisioningStatus;         
+                "PowerApps"= $PowerApps.ProvisioningStatus;  } #>
+            } 
+            # AssignedLicenses
+            ELSE {         
+                # Add new item.
+                Write-Host "# Add" $user.UserPrincipalName
    
-    Add-PnPListItem -List $ListName -Values @{"Title" = $user.ObjectId;
-    "Department"= $user.Department;
-    "UPN"= $user.UserPrincipalName; "User_x0020_Type" = $user.UserType; 
-    "RMS"= $RMS.ProvisioningStatus;                   #.Equals("Success");
-    "Exchange"= $Exchange.ProvisioningStatus;         #.Equals("Success");
-    "Flow"= $Flow.ProvisioningStatus;                 #.Equals("Success");
-    "Forms"= $Forms.ProvisioningStatus;  
-    "Teams"= $Teams.ProvisioningStatus;               #.Equals("Success");
-    "Planner"= $Planner.ProvisioningStatus;           #.Equals("Success");
-    "ProPlus"= $ProPlus.ProvisioningStatus;           #.Equals("Success");
-    "SharePoint"= $SharePoint.ProvisioningStatus;     #.Equals("Success");
-    "Skype"= $Skype.ProvisioningStatus;               #.Equals("Success");
-    "Stream"= $Stream.ProvisioningStatus;             #.Equals("Success");
-    "Online"= $SPOnline.ProvisioningStatus;           #.Equals("Success");
-    "PowerApps"= $PowerApps.ProvisioningStatus        #.Equals("Success");
-     } 
-    
-    }
+                Add-PnPListItem -List $ListName -Values @{"Title" = $user.ObjectId;
+                    "Department"= $user.Department;
+                    "UPN"= $user.UserPrincipalName; "User_x0020_Type" = $user.UserType; 
+                    "RMS"= $RMS.ProvisioningStatus;                   #.Equals("Success");
+                    "Exchange"= $Exchange.ProvisioningStatus;         #.Equals("Success");
+                    "Flow"= $Flow.ProvisioningStatus;                 #.Equals("Success");
+                    "Forms"= $Forms.ProvisioningStatus;  
+                    "Teams"= $Teams.ProvisioningStatus;               #.Equals("Success");
+                    "Planner"= $Planner.ProvisioningStatus;           #.Equals("Success");
+                    "ProPlus"= $ProPlus.ProvisioningStatus;           #.Equals("Success");
+                    "SharePoint"= $SharePoint.ProvisioningStatus;     #.Equals("Success");
+                    "Skype"= $Skype.ProvisioningStatus;               #.Equals("Success");
+                    "Stream"= $Stream.ProvisioningStatus;             #.Equals("Success");
+                    "Online"= $SPOnline.ProvisioningStatus;           #.Equals("Success");
+                    "PowerApps"= $PowerApps.ProvisioningStatus        #.Equals("Success");
+                } 
+            }
 
- # Remove  user from Unlicensed List as the user  has a license.
+            # Remove  user from Unlicensed List as the user  has a license.
  
- # Get Item from Array
- $UnlicensedItem =  $UnlicensedItems | where {($_.Title -eq $user.ObjectId)}
-  If ($UnlicensedItem.Title -eq $user.ObjectId) {
-  Write-Host "UnlicensedItems"
- # If Query is not Null, then delete
- Write-Host "-Remove from Unlicensed " $user.UserPrincipalName
-# Remove-PnPListItem  -List $Unlicensed -Identity $UnlicensedItem.id -Force
- }
+            # Get Item from Array
+            $UnlicensedItem =  $UnlicensedItems | where {($_.Title -eq $user.ObjectId)}
+            If ($UnlicensedItem.Title -eq $user.ObjectId) {
+                Write-Host "UnlicensedItems"
+                # If Query is not Null, then delete
+                Write-Host "-Remove from Unlicensed " $user.UserPrincipalName
+                # Remove-PnPListItem  -List $Unlicensed -Identity $UnlicensedItem.id -Force
+            }
 
-    # End loop AssignedLicenses
+            # End loop AssignedLicenses
+        }
+        ELSE {
+            # No Assigned License
 
-    }
-
-     ELSE {
-# No Assigned License
-
-# Remove  User from G3 Licensed as the user does not have a license.
-    # Get Item from Array
-    $ListItem = $ListItems | where {($_.Title -eq $user.ObjectId)}
-    If ($listitem.Title -eq $user.ObjectId) { 
- Write-Host "-Remove from G3 " $user.UserPrincipalName
-# Remove-PnPListItem  -List $ListName -Identity $ListItem.id -Force
- }
-
+            # Remove  User from G3 Licensed as the user does not have a license.
+            # Get Item from Array
+            $ListItem = $ListItems | where {($_.Title -eq $user.ObjectId)}
+            If ($listitem.Title -eq $user.ObjectId) { 
+            Write-Host "-Remove from G3 " $user.UserPrincipalName
+            # Remove-PnPListItem  -List $ListName -Identity $ListItem.id -Force
+        }
  
- # User found. Update List Item
-$UnlicensedItem =  $UnlicensedItems | where {($_.Title -eq $user.ObjectId)}
-  If ($UnlicensedItem.Title -eq $user.ObjectId) {
-   Write-Host "Unlicesned Update" $user.UserPrincipalName;
-   <#
-      Set-PnPListItem -List $Unlicensed -Identity $UnlicensedItem.id -Values @{"Title" = $user.ObjectId;
-    "Department"= $user.Department;
-     "UPN"= $user.UserPrincipalName; "UserType" = $user.UserType} #>
-    } else {
- # User not found. Add user to list.
+        # User found. Update List Item
+        $UnlicensedItem =  $UnlicensedItems | where {($_.Title -eq $user.ObjectId)}
+        If ($UnlicensedItem.Title -eq $user.ObjectId) {
+            Write-Host "Unlicesned Update" $user.UserPrincipalName;
+            <#
+                Set-PnPListItem -List $Unlicensed -Identity $UnlicensedItem.id -Values @{"Title" = $user.ObjectId;
+            "Department"= $user.Department;
+                "UPN"= $user.UserPrincipalName; "UserType" = $user.UserType} #>
+        } 
+        ELSE {
+            # User not found. Add user to list.
  
- Write-Host "# Add Unlicensed " $user.UserPrincipalName
+            Write-Host "# Add Unlicensed " $user.UserPrincipalName
 
-  Add-PnPListItem -List $Unlicensed  -Values @{"Title" = $user.ObjectId;
-    "Department"= $user.Department;
-    "UPN"= $user.UserPrincipalName;
-    "UserType" = $user.UserType} 
-    }
+            Add-PnPListItem -List $Unlicensed  -Values @{"Title" = $user.ObjectId;
+                "Department"= $user.Department;
+                "UPN"= $user.UserPrincipalName;
+                "UserType" = $user.UserType} 
+        }
 
-# End loop Unlicensed Licenses
+        # End loop Unlicensed Licenses
 
-
-}
+        }
 
    }
    #Group
-
-  }
+}
 
